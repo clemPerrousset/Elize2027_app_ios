@@ -12,6 +12,7 @@ struct Elise_e_2027App: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.dark)
         }
     }
 }

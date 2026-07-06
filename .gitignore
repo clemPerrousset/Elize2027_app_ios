@@ -1,0 +1,15 @@
+# Secrets — ne jamais committer
+Elisée 2027/Config.swift
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# macOS
+.DS_Store
