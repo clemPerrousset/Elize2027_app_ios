@@ -132,8 +132,8 @@ let allCandidates: [CandidateInfo] = [
               photo: "\(WC)/%C3%89douard_Philippe_%C3%A0_Ch%C3%A2lons-en-Champagne_en_2023._(cropped).jpg"),
     candidate("darmanin_gerald",     "Gérald Darmanin",       "Renaissance / LR",    "Centre / Droite", "#C8A951",
               photo: "\(WC)/Darmanin_2024_(cropped).jpg"),
-    candidate("bardella_jordan",     "Jordan Bardella",       "RN",                  "Extrême droite",  "#1565C0",
-              photo: "\(WC)/Jordan_Bardella_(cropped).jpg"),
+    candidate("lepen_marine",        "Marine Le Pen",         "RN",                  "Extrême droite",  "#1565C0",
+              photo: "\(WC)/Marine_Le_Pen_2025_(cropped).jpg"),
     candidate("philippot_florian",   "Florian Philippot",     "Les Patriotes",       "Extrême droite",  "#546E7A",
               photo: "https://fr.wikipedia.org/wiki/Special:FilePath/Florian_Philippot_(cropped).JPG"),
     candidate("zemmour_eric",        "Éric Zemmour",          "Reconquête",          "Extrême droite",  "#1A1A40",
@@ -143,7 +143,7 @@ let allCandidates: [CandidateInfo] = [
 // MARK: - Mock data
 
 let mockVoteCounts: [String: Int] = [
-    "bardella_jordan": 8500, "melenchon_jeanluc": 6000, "tondelier_marine": 6000,
+    "lepen_marine": 8500, "melenchon_jeanluc": 6000, "tondelier_marine": 6000,
     "attal_gabriel": 5200, "philippe_edouard": 4800, "glucksmann_raphael": 3500,
     "ruffin_francois": 2800, "retailleau_bruno": 2400, "wauquiez_laurent": 2100,
     "bertrand_xavier": 1800, "zemmour_eric": 1200, "philippot_florian": 900,

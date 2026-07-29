@@ -12,33 +12,35 @@ struct VoteScreen: View {
             ZStack {
                 Color(hex: "#0D0D1A").ignoresSafeArea()
 
-                ScrollView {
-                    LazyVStack(spacing: 10) {
-                        ForEach(Array(viewModel.candidates.enumerated()), id: \.element.id) { index, candidate in
-                            CandidateCardView(
-                                candidate: candidate,
-                                rank: index + 1,
-                                enabled: viewModel.cooldownSeconds == 0
-                            )
-                            .onGeometryChange(for: CGPoint.self) { geo in
-                                let frame = geo.frame(in: .global)
-                                return CGPoint(x: frame.midX, y: frame.midY)
-                            } action: { center in
-                                cardCenters[candidate.id] = center
-                            }
-                            .onTapGesture {
-                                guard viewModel.cooldownSeconds == 0 else { return }
-                                explosionOrigin = cardCenters[candidate.id] ?? CGPoint(x: 200, y: 400)
-                                explosionTrigger += 1
-                                Task { await viewModel.vote(candidateId: candidate.info.id) }
-                            }
+                List {
+                    ForEach(Array(viewModel.candidates.enumerated()), id: \.element.id) { index, candidate in
+                        CandidateCardView(
+                            candidate: candidate,
+                            rank: index + 1,
+                            enabled: viewModel.cooldownSeconds == 0
+                        )
+                        .onGeometryChange(for: CGPoint.self) { geo in
+                            let frame = geo.frame(in: .global)
+                            return CGPoint(x: frame.midX, y: frame.midY)
+                        } action: { center in
+                            cardCenters[candidate.id] = center
                         }
+                        .onTapGesture {
+                            guard viewModel.cooldownSeconds == 0 else { return }
+                            explosionOrigin = cardCenters[candidate.id] ?? CGPoint(x: 200, y: 400)
+                            explosionTrigger += 1
+                            Task { await viewModel.vote(candidateId: candidate.info.id) }
+                        }
+                        .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 4)
-                    .padding(.bottom, 80)
-                    .animation(.spring(response: 0.35, dampingFraction: 0.7), value: viewModel.candidates.map(\.id))
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .padding(.top, 4)
+                .padding(.bottom, 80)
+                .animation(.spring(response: 0.35, dampingFraction: 0.7), value: viewModel.candidates.map(\.id))
                 .refreshable { await viewModel.refresh() }
 
                 // Cooldown pill
@@ -69,14 +71,6 @@ struct VoteScreen: View {
             .toolbar {
                 ToolbarItem(placement: .automatic) {
                     HStack(spacing: 4) {
-                        Button {
-                            viewModel.toggleMockMode()
-                        } label: {
-                            Text(viewModel.isMockMode ? "🎭 Live" : "🎭 Mock")
-                                .font(.system(size: 13))
-                                .foregroundStyle(viewModel.isMockMode ? Color(hex: "#FFD700") : .secondary)
-                        }
-
                         Button {
                             Task { await viewModel.refresh() }
                         } label: {
