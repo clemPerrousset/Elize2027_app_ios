@@ -63,7 +63,7 @@ struct VoteScreen: View {
                     .allowsHitTesting(false)
                     .ignoresSafeArea()
             }
-            .navigationTitle("Élyze 2027")
+            .navigationTitle("Elisée 2027")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -80,7 +80,7 @@ struct VoteScreen: View {
                                 Image(systemName: "arrow.clockwise")
                             }
                         }
-                        .disabled(viewModel.isLoading || viewModel.isMockMode)
+                        .disabled(viewModel.isLoading)
                     }
                 }
             }

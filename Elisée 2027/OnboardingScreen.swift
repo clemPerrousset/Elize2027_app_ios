@@ -11,7 +11,7 @@ struct OnboardingScreen: View {
                 VStack(alignment: .leading, spacing: 24) {
                     // Header
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Élyze 2027")
+                        Text("Elisée 2027")
                             .font(.system(size: 36, weight: .black))
                             .foregroundStyle(.white)
                         Text("Sondage présidentiel participatif")
@@ -40,7 +40,7 @@ struct OnboardingScreen: View {
                         Text("Open source")
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(.white)
-                        Link("📱 Application Android", destination: URL(string: "https://github.com/clemPerrousset/Elyze2027_app")!)
+                        Link("📱 Application IOS", destination: URL(string: "https://github.com/clemPerrousset/Elize2027_app_ios")!)
                             .font(.system(size: 14))
                             .foregroundStyle(Color(hex: "#7C3AED"))
                         Link("⚙️ Backend Rust", destination: URL(string: "https://github.com/clemPerrousset/Elyze_backend")!)

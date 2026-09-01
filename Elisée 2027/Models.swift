@@ -139,16 +139,3 @@ let allCandidates: [CandidateInfo] = [
     candidate("zemmour_eric",        "Éric Zemmour",          "Reconquête",          "Extrême droite",  "#1A1A40",
               photo: "\(WC)/Portrait_d'%C3%89ric_Zemmour,_avril_2022.jpg"),
 ]
-
-// MARK: - Mock data
-
-let mockVoteCounts: [String: Int] = [
-    "lepen_marine": 8500, "melenchon_jeanluc": 6000, "tondelier_marine": 6000,
-    "attal_gabriel": 5200, "philippe_edouard": 4800, "glucksmann_raphael": 3500,
-    "ruffin_francois": 2800, "retailleau_bruno": 2400, "wauquiez_laurent": 2100,
-    "bertrand_xavier": 1800, "zemmour_eric": 1200, "philippot_florian": 900,
-    "darmanin_gerald": 750, "dupontaignan_nicolas": 600, "arthaud_nathalie": 450,
-    "asselineau_francois": 320, "guedj_jerome": 280, "bouamrane_karim": 210,
-    "hollande_francois": 180, "faure_olivier": 150, "lucaslundy_benjamin": 120,
-    "massard_lydie": 90, "batho_delphine": 70, "lisnard_david": 50,
-]

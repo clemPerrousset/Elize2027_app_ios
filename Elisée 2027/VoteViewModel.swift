@@ -7,7 +7,6 @@ class VoteViewModel {
     var error: String? = nil
     var cooldownSeconds = 0
     var onboardingDone: Bool
-    var isMockMode = false
 
     private let repo = VoteRepository()
     private let phoneId = getPhoneId()
@@ -32,7 +31,6 @@ class VoteViewModel {
     }
 
     func refresh() async {
-        guard !isMockMode else { return }
         await fetchData()
     }
 
@@ -46,7 +44,6 @@ class VoteViewModel {
         }
         startCooldown()
 
-        guard !isMockMode else { return }
         let token = generateHmacToken(phoneId: phoneId, secret: Config.hmacSecret)
         do {
             try await repo.castVote(phoneId: phoneId, candidateId: candidateId, token: token)
@@ -55,18 +52,6 @@ class VoteViewModel {
                 updateVoteLocally(newVoteId: previousVotedId)
             }
             self.error = error.localizedDescription
-        }
-    }
-
-    func toggleMockMode() {
-        isMockMode.toggle()
-        if isMockMode {
-            applyServerData(
-                counts: mockVoteCounts.map { CandidateCount(id: $0.key, count: $0.value) },
-                votedId: nil
-            )
-        } else {
-            Task { await fetchData() }
         }
     }
 
