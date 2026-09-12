@@ -6,7 +6,16 @@ struct ContentView: View {
     var body: some View {
         Group {
             if viewModel.onboardingDone {
-                VoteScreen(viewModel: viewModel)
+                TabView {
+                    VoteScreen(viewModel: viewModel)
+                        .tabItem {
+                            Label("Votes", systemImage: "checkmark.circle")
+                        }
+                    ProgressionScreen(viewModel: viewModel)
+                        .tabItem {
+                            Label("Progression", systemImage: "chart.line.uptrend.xyaxis")
+                        }
+                }
             } else {
                 OnboardingScreen { viewModel.markOnboardingDone() }
             }

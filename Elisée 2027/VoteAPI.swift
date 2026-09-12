@@ -19,6 +19,15 @@ struct VoteAPI {
         return try JSONDecoder().decode(DeviceVoteResponse.self, from: data).candidate_id
     }
 
+    func getVotesHistory(candidateIds: [String]) async throws -> [VoteHistoryPoint] {
+        var components = URLComponents(string: "\(serverURL)/votes/history")!
+        if !candidateIds.isEmpty {
+            components.queryItems = [URLQueryItem(name: "candidate_ids", value: candidateIds.joined(separator: ","))]
+        }
+        let (data, _) = try await URLSession.shared.data(from: components.url!)
+        return try JSONDecoder().decode(VoteHistoryResponse.self, from: data).history
+    }
+
     func castVote(phoneId: String, candidateId: String, token: String) async throws {
         var request = URLRequest(url: URL(string: "\(serverURL)/vote")!)
         request.httpMethod = "POST"

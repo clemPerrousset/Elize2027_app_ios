@@ -7,10 +7,13 @@ class VoteViewModel {
     var error: String? = nil
     var cooldownSeconds = 0
     var onboardingDone: Bool
+    var history: [VoteHistoryPoint] = []
+    var isLoadingHistory = false
 
     private let repo = VoteRepository()
     private let phoneId = getPhoneId()
     private var cooldownTask: Task<Void, Never>?
+    private var hasLoadedHistory = false
 
     init() {
         onboardingDone = UserDefaults.standard.bool(forKey: "onboardingDone")
@@ -32,6 +35,19 @@ class VoteViewModel {
 
     func refresh() async {
         await fetchData()
+    }
+
+    func loadHistoryIfNeeded() async {
+        guard !hasLoadedHistory else { return }
+        hasLoadedHistory = true
+        await loadHistory()
+    }
+
+    func loadHistory() async {
+        isLoadingHistory = true
+        let ids = allCandidates.map(\.id)
+        history = await repo.fetchHistory(candidateIds: ids)
+        isLoadingHistory = false
     }
 
     func vote(candidateId: String) async {
