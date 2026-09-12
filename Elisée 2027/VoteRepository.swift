@@ -1,6 +1,7 @@
 import Foundation
 
 private let kVotedCandidateKey = "votedCandidate"
+private let kHasVotedBeforeKey = "hasVotedBefore"
 
 struct VoteRepository {
     private let api = VoteAPI()
@@ -21,8 +22,17 @@ struct VoteRepository {
         return UserDefaults.standard.string(forKey: kVotedCandidateKey)
     }
 
-    func castVote(phoneId: String, candidateId: String, token: String) async throws {
+    /// Vote, puis renvoie `true` si c'était le tout premier vote jamais effectué sur cet appareil
+    /// (utilisé pour proposer la notation native une seule fois, juste après ce premier vote).
+    @discardableResult
+    func castVote(phoneId: String, candidateId: String, token: String) async throws -> Bool {
         try await api.castVote(phoneId: phoneId, candidateId: candidateId, token: token)
         UserDefaults.standard.set(candidateId, forKey: kVotedCandidateKey)
+
+        let isFirstEverVote = !UserDefaults.standard.bool(forKey: kHasVotedBeforeKey)
+        if isFirstEverVote {
+            UserDefaults.standard.set(true, forKey: kHasVotedBeforeKey)
+        }
+        return isFirstEverVote
     }
 }

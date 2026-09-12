@@ -9,6 +9,9 @@ class VoteViewModel {
     var onboardingDone: Bool
     var history: [VoteHistoryPoint] = []
     var isLoadingHistory = false
+    // Bascule à `true` juste après le tout premier vote — observé par la vue pour
+    // proposer la notation native (StoreKit), puis remis à `false`.
+    var shouldRequestReview = false
 
     private let repo = VoteRepository()
     private let phoneId = getPhoneId()
@@ -62,7 +65,8 @@ class VoteViewModel {
 
         let token = generateHmacToken(phoneId: phoneId, secret: Config.hmacSecret)
         do {
-            try await repo.castVote(phoneId: phoneId, candidateId: candidateId, token: token)
+            let isFirstEverVote = try await repo.castVote(phoneId: phoneId, candidateId: candidateId, token: token)
+            if isFirstEverVote { shouldRequestReview = true }
         } catch {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
                 updateVoteLocally(newVoteId: previousVotedId)

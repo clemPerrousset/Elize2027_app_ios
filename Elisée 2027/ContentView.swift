@@ -1,7 +1,9 @@
+import StoreKit
 import SwiftUI
 
 struct ContentView: View {
     @State private var viewModel = VoteViewModel()
+    @Environment(\.requestReview) private var requestReview
 
     var body: some View {
         Group {
@@ -21,5 +23,11 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.onboardingDone)
+        // Propose la notation native (fenêtre système App Store), juste après le premier vote.
+        .onChange(of: viewModel.shouldRequestReview) { _, shouldRequest in
+            guard shouldRequest else { return }
+            requestReview()
+            viewModel.shouldRequestReview = false
+        }
     }
 }
