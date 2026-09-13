@@ -103,7 +103,8 @@ struct ProgressionScreen: View {
                 ForEach(s.points, id: \.date) { point in
                     LineMark(
                         x: .value("Date", Date(timeIntervalSince1970: TimeInterval(point.date))),
-                        y: .value("Votes", point.votes)
+                        y: .value("Votes", point.votes),
+                        series: .value("Candidat", s.id)
                     )
                     .interpolationMethod(.monotone)
                 }
