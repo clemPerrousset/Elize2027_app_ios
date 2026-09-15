@@ -13,9 +13,10 @@ struct VoteAPI {
         return try JSONDecoder().decode(VoteCountResponse.self, from: data).candidates
     }
 
-    func getDeviceVote(phoneId: String) async throws -> String? {
-        let url = URL(string: "\(serverURL)/votes/\(phoneId)")!
-        let (data, _) = try await URLSession.shared.data(from: url)
+    func getDeviceVote(phoneId: String, token: String) async throws -> String? {
+        var components = URLComponents(string: "\(serverURL)/votes/\(phoneId)")!
+        components.queryItems = [URLQueryItem(name: "token", value: token)]
+        let (data, _) = try await URLSession.shared.data(from: components.url!)
         return try JSONDecoder().decode(DeviceVoteResponse.self, from: data).candidate_id
     }
 

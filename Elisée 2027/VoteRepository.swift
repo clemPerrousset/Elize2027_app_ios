@@ -14,8 +14,8 @@ struct VoteRepository {
         (try? await api.getVotesHistory(candidateIds: candidateIds)) ?? []
     }
 
-    func fetchDeviceVote(phoneId: String) async -> String? {
-        if let serverVote = try? await api.getDeviceVote(phoneId: phoneId) {
+    func fetchDeviceVote(phoneId: String, token: String) async -> String? {
+        if let serverVote = try? await api.getDeviceVote(phoneId: phoneId, token: token) {
             UserDefaults.standard.set(serverVote, forKey: kVotedCandidateKey)
             return serverVote
         }

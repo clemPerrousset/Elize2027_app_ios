@@ -29,8 +29,9 @@ class VoteViewModel {
     func fetchData() async {
         isLoading = true
         error = nil
+        let token = generateHmacToken(phoneId: phoneId, secret: Config.hmacSecret)
         async let counts = repo.fetchVotes()
-        async let votedId = repo.fetchDeviceVote(phoneId: phoneId)
+        async let votedId = repo.fetchDeviceVote(phoneId: phoneId, token: token)
         let (c, v) = await (counts, votedId)
         isLoading = false
         applyServerData(counts: c, votedId: v)
