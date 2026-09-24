@@ -6,6 +6,7 @@ struct VoteScreen: View {
     @State private var explosionTrigger = 0
     @State private var explosionOrigin = CGPoint.zero
     @State private var cardCenters: [String: CGPoint] = [:]
+    @State private var programmeCandidateId: String?
 
     var body: some View {
         NavigationStack {
@@ -17,7 +18,8 @@ struct VoteScreen: View {
                         CandidateCardView(
                             candidate: candidate,
                             rank: index + 1,
-                            enabled: viewModel.cooldownSeconds == 0
+                            enabled: viewModel.cooldownSeconds == 0,
+                            onOpenProgramme: { programmeCandidateId = candidate.info.id }
                         )
                         .onGeometryChange(for: CGPoint.self) { geo in
                             let frame = geo.frame(in: .global)
@@ -62,6 +64,11 @@ struct VoteScreen: View {
                 ConfettiView(trigger: explosionTrigger, origin: explosionOrigin)
                     .allowsHitTesting(false)
                     .ignoresSafeArea()
+            }
+            .navigationDestination(item: $programmeCandidateId) { id in
+                if let info = allCandidates.first(where: { $0.id == id }) {
+                    ProgrammeScreen(info: info)
+                }
             }
             .navigationTitle("Elisée 2027")
             #if os(iOS)

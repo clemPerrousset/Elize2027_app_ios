@@ -4,6 +4,7 @@ struct CandidateCardView: View {
     let candidate: CandidateUiState
     let rank: Int
     var enabled: Bool = true
+    var onOpenProgramme: (() -> Void)? = nil
 
     private var info: CandidateInfo { candidate.info }
     private var partyColor: Color { info.color }
@@ -72,7 +73,28 @@ struct CandidateCardView: View {
                 .foregroundStyle(.white)
                 .lineLimit(1)
             partyChip
+            if let onOpenProgramme {
+                programmeButton(action: onOpenProgramme)
+            }
         }
+    }
+
+    // Style .borderless : le bouton garde son tap pour lui, sans déclencher le vote de la carte.
+    private func programmeButton(action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text("📄 Programme")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color(hex: "#8888AA").opacity(0.5), lineWidth: 1)
+                )
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.borderless)
+        .padding(.top, 2)
     }
 
     private var partyChip: some View {
