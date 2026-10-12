@@ -7,7 +7,7 @@ struct ProgrammeScreen: View {
     // "Ne plus afficher" coché → masqué définitivement ; sinon réaffiché à chaque ouverture.
     @AppStorage("programmeDisclaimerHidden") private var disclaimerHidden = false
     @State private var showDisclaimer = false
-    @State private var dontShowAgain = false
+    @State private var showCompare = false
 
     private var programme: Programme? { ProgrammeStore.programme(for: info.id) }
     private var partyColor: Color { info.color }
@@ -45,61 +45,24 @@ struct ProgrammeScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         #endif
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("⚖️ Comparer") { showCompare = true }
+            }
+        }
+        .navigationDestination(isPresented: $showCompare) {
+            // L'avertissement vient d'être vu ici : inutile de le réafficher dans la comparaison.
+            ProgrammeCompareScreen(initialLeftId: info.id, showsDisclaimer: false)
+        }
         .onAppear {
             if !disclaimerHidden { showDisclaimer = true }
         }
         .sheet(isPresented: $showDisclaimer) {
-            disclaimerSheet
-                .presentationDetents([.height(400)])
-                .presentationDragIndicator(.visible)
-                .presentationBackground(Color(hex: "#16162A"))
-        }
-    }
-
-    // MARK: - Disclaimer
-
-    private var disclaimerSheet: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("📢").font(.system(size: 32))
-            Text("Des programmes qui évoluent")
-                .font(.system(size: 20, weight: .bold))
-                .foregroundStyle(.white)
-            Text("Les programmes peuvent évoluer au cours de la campagne. Certains candidats n'ont pas encore publié de programme officiel : leur fiche repose alors sur leurs déclarations publiques et sera complétée dès sa parution.\n\nMettez régulièrement l'application à jour pour disposer des dernières informations.")
-                .font(.system(size: 14))
-                .foregroundStyle(Color(hex: "#8888AA"))
-                .fixedSize(horizontal: false, vertical: true)
-
-            Button {
-                dontShowAgain.toggle()
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: dontShowAgain ? "checkmark.square.fill" : "square")
-                        .font(.system(size: 20))
-                        .foregroundStyle(dontShowAgain ? Color(hex: "#7B7BFF") : Color(hex: "#8888AA"))
-                    Text("Ne plus afficher")
-                        .font(.system(size: 14))
-                        .foregroundStyle(.white)
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            Spacer(minLength: 0)
-
-            Button {
+            ProgrammeDisclaimerSheet { dontShowAgain in
                 if dontShowAgain { disclaimerHidden = true }
                 showDisclaimer = false
-            } label: {
-                Text("J'ai compris")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color(hex: "#7B7BFF"), in: RoundedRectangle(cornerRadius: 12))
             }
         }
-        .padding(24)
-        .padding(.top, 8)
     }
 
     // MARK: - Header
@@ -118,7 +81,7 @@ struct ProgrammeScreen: View {
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background(partyColor.opacity(0.18), in: RoundedRectangle(cornerRadius: 6))
-                    if let programme { statusBadge(programme.status) }
+                    if let programme { ProgrammeStatusBadge(status: programme.status) }
                 }
             }
 
@@ -155,21 +118,6 @@ struct ProgrammeScreen: View {
         .frame(width: 72, height: 72)
         .clipShape(Circle())
         .background(partyColor.opacity(0.2), in: Circle())
-    }
-
-    private func statusBadge(_ status: String) -> some View {
-        let (label, color): (String, Color) = switch status {
-            case "declared": ("Candidature déclarée", Color(hex: "#4CAF50"))
-            case "potential": ("Candidature envisagée", Color(hex: "#FFB300"))
-            case "withdrawn": ("Candidature retirée", Color(hex: "#8888AA"))
-            default: ("Statut à confirmer", Color(hex: "#8888AA"))
-        }
-        return HStack(spacing: 6) {
-            Circle().fill(color).frame(width: 7, height: 7)
-            Text(label)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(color)
-        }
     }
 
     // MARK: - Sections
@@ -305,19 +253,92 @@ struct ProgrammeScreen: View {
     }
 }
 
+// MARK: - Shared (aussi utilisés par ProgrammeCompareScreen)
+
+/// Avertissement "les programmes évoluent", avec la case "Ne plus afficher".
+struct ProgrammeDisclaimerSheet: View {
+    let onDone: (_ dontShowAgain: Bool) -> Void
+    @State private var dontShowAgain = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("📢").font(.system(size: 32))
+            Text("Des programmes qui évoluent")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(.white)
+            Text("Les programmes peuvent évoluer au cours de la campagne. Certains candidats n'ont pas encore publié de programme officiel : leur fiche repose alors sur leurs déclarations publiques et sera complétée dès sa parution.\n\nMettez régulièrement l'application à jour pour disposer des dernières informations.")
+                .font(.system(size: 14))
+                .foregroundStyle(Color(hex: "#8888AA"))
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                dontShowAgain.toggle()
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: dontShowAgain ? "checkmark.square.fill" : "square")
+                        .font(.system(size: 20))
+                        .foregroundStyle(dontShowAgain ? Color(hex: "#7B7BFF") : Color(hex: "#8888AA"))
+                    Text("Ne plus afficher")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.white)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            Spacer(minLength: 0)
+
+            Button {
+                onDone(dontShowAgain)
+            } label: {
+                Text("J'ai compris")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color(hex: "#7B7BFF"), in: RoundedRectangle(cornerRadius: 12))
+            }
+        }
+        .padding(24)
+        .padding(.top, 8)
+        .presentationDetents([.height(400)])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(Color(hex: "#16162A"))
+    }
+}
+
+struct ProgrammeStatusBadge: View {
+    let status: String
+
+    var body: some View {
+        let (label, color): (String, Color) = switch status {
+            case "declared": ("Candidature déclarée", Color(hex: "#4CAF50"))
+            case "potential": ("Candidature envisagée", Color(hex: "#FFB300"))
+            case "withdrawn": ("Candidature retirée", Color(hex: "#8888AA"))
+            default: ("Statut à confirmer", Color(hex: "#8888AA"))
+        }
+        HStack(spacing: 6) {
+            Circle().fill(color).frame(width: 7, height: 7)
+            Text(label)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(color)
+        }
+    }
+}
+
 // MARK: - Helpers
 
 private let monthsFR = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."]
 
 // "2026-05" → "mai 2026"
-private func formatMonth(_ yearMonth: String?) -> String? {
+func formatMonth(_ yearMonth: String?) -> String? {
     guard let parts = yearMonth?.split(separator: "-"), parts.count >= 2,
           let month = Int(parts[1]), (1...12).contains(month) else { return nil }
     return "\(monthsFR[month - 1]) \(parts[0])"
 }
 
 // "2026-09-23" → "23/09/2026"
-private func formatDay(_ isoDate: String?) -> String? {
+func formatDay(_ isoDate: String?) -> String? {
     guard let parts = isoDate?.split(separator: "-"), parts.count == 3 else { return nil }
     return "\(parts[2])/\(parts[1])/\(parts[0])"
 }

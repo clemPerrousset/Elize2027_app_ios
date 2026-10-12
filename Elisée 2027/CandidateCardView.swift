@@ -5,6 +5,7 @@ struct CandidateCardView: View {
     let rank: Int
     var enabled: Bool = true
     var onOpenProgramme: (() -> Void)? = nil
+    var onCompare: (() -> Void)? = nil
 
     private var info: CandidateInfo { candidate.info }
     private var partyColor: Color { info.color }
@@ -73,24 +74,40 @@ struct CandidateCardView: View {
                 .foregroundStyle(.white)
                 .lineLimit(1)
             partyChip
-            if let onOpenProgramme {
-                programmeButton(action: onOpenProgramme)
+            // Sur une ligne de préférence (sans les emojis si la place manque),
+            // l'un sous l'autre seulement sur les écrans les plus étroits.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 6) { actionButtons(withEmoji: true) }
+                HStack(spacing: 6) { actionButtons(withEmoji: false) }
+                VStack(alignment: .leading, spacing: 4) { actionButtons(withEmoji: false) }
             }
         }
     }
 
+    @ViewBuilder
+    private func actionButtons(withEmoji: Bool) -> some View {
+        if let onOpenProgramme {
+            actionButton(withEmoji ? "📄 Programme" : "Programme", action: onOpenProgramme)
+        }
+        if let onCompare {
+            actionButton(withEmoji ? "⚖️ Comparer" : "Comparer", action: onCompare)
+        }
+    }
+
     // Style .borderless : le bouton garde son tap pour lui, sans déclencher le vote de la carte.
-    private func programmeButton(action: @escaping () -> Void) -> some View {
+    private func actionButton(_ label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text("📄 Programme")
+            Text(label)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white)
-                .padding(.horizontal, 10)
+                .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color(hex: "#8888AA").opacity(0.5), lineWidth: 1)
                 )
+                .lineLimit(1)
+                .fixedSize()
                 .contentShape(Rectangle())
         }
         .buttonStyle(.borderless)

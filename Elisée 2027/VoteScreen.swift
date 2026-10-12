@@ -7,6 +7,7 @@ struct VoteScreen: View {
     @State private var explosionOrigin = CGPoint.zero
     @State private var cardCenters: [String: CGPoint] = [:]
     @State private var programmeCandidateId: String?
+    @State private var compareCandidateId: String?
 
     var body: some View {
         NavigationStack {
@@ -19,7 +20,8 @@ struct VoteScreen: View {
                             candidate: candidate,
                             rank: index + 1,
                             enabled: viewModel.cooldownSeconds == 0,
-                            onOpenProgramme: { programmeCandidateId = candidate.info.id }
+                            onOpenProgramme: { programmeCandidateId = candidate.info.id },
+                            onCompare: { compareCandidateId = candidate.info.id }
                         )
                         .onGeometryChange(for: CGPoint.self) { geo in
                             let frame = geo.frame(in: .global)
@@ -69,6 +71,9 @@ struct VoteScreen: View {
                 if let info = allCandidates.first(where: { $0.id == id }) {
                     ProgrammeScreen(info: info)
                 }
+            }
+            .navigationDestination(item: $compareCandidateId) { id in
+                ProgrammeCompareScreen(initialLeftId: id)
             }
             .navigationTitle("Elisée 2027")
             #if os(iOS)

@@ -99,7 +99,9 @@ class VoteViewModel {
 
     private func applyServerData(counts: [CandidateCount], votedId: String?) {
         let countMap = Dictionary(uniqueKeysWithValues: counts.map { ($0.id, $0.count) })
-        let maxCount = max(countMap.values.max() ?? 1, 1)
+        // Max calculé sur les seuls candidats affichés : un candidat retiré de l'app
+        // mais encore présent côté serveur ne doit pas écraser les barres.
+        let maxCount = max(allCandidates.map { countMap[$0.id] ?? 0 }.max() ?? 1, 1)
 
         candidates = allCandidates.map { info in
             CandidateUiState(
